@@ -11,7 +11,7 @@ body {
   font-size: 14px;
 }
 
-a { color: inherit; text-decoration: none; } /* customização da tag em específico */
+a { color: inherit; text-decoration: none; }
 p { margin: 0 0 10px; }
 
 h1, h2, h3 {
@@ -67,6 +67,10 @@ table { width: 100%; border-collapse: collapse; }
 th { padding: 10px; background: #18181c; text-align: left; font-size: 11px; font-weight: 400; text-transform: uppercase; color: #8b8b93; }
 td { padding: 12px 10px; border-top: 1px solid #26262b; }
 
+/* ===== LOGO ===== */
+.logo { display: block; width: 260px; max-width: 100%; height: auto; filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 6px rgba(255,255,255,.35)); }
+.logo-topo { width: auto; height: 56px; }
+
 /* ===== TELAS DE LOGIN / CADASTRO ===== */
 .auth { display: flex; min-height: 100vh; }
 
@@ -80,6 +84,19 @@ td { padding: 12px 10px; border-top: 1px solid #26262b; }
 .auth-form { flex: 1; padding: 40px 60px; display: flex; flex-direction: column; justify-content: center; }
 .auth-form form { width: 100%; max-width: 460px; margin: 0 auto; }
 .auth-form .botao { width: 100%; margin-top: 10px; }
+
+/* lista de exigências do cadastro */
+.requisitos { margin-bottom: 16px; padding: 14px 16px; background: #141417; border: 1px solid #26262b; border-radius: 8px; }
+.requisitos.destacar { border-color: #c8102e; }
+.requisitos ul { margin: 0; padding: 0; list-style: none; }
+.requisitos li { padding: 4px 0; font-size: 13px; }
+.requisitos li.ok { color: #f4f1ea; }
+.requisitos li.erro { color: #8b8b93; }
+
+.mensagem { margin-bottom: 8px; font-size: 13px; }
+.mensagem:empty { display: none; }
+.mensagem.ok { color: #3fb76b; }
+.mensagem.erro { color: #e0143a; }
 
 /* ===== TELAS DO SISTEMA ===== */
 .topo { padding: 22px 0; border-bottom: 1px solid #1e1e22; }
