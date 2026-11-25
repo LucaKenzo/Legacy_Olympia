@@ -191,6 +191,16 @@
     var container = document.getElementById("div_lista_fichas");
     container.innerHTML = "";
 
+    if (fichasBanco.length === 0) {
+      container.innerHTML = `
+        <div class="card destaque">
+          <p class="vermelho"><strong>Nenhuma ficha modelo encontrada no banco.</strong></p>
+          <p class="cinza pequeno">Execute o script de INSERT das fichas ABC, UPPER / LOWER e FULL BODY no MySQL da VM e recarregue a página.</p>
+        </div>
+      `;
+      return;
+    }
+
     for (var i = 0; i < fichasBanco.length; i++) {
       var ficha = fichasBanco[i];
       var isAtiva = (tituloFichaAtiva === ficha.titulo);
@@ -229,6 +239,7 @@
     }
   }
 
+  
   function visualizarFicha(indiceFicha, indiceTreino) {
     var ficha = fichasBanco[indiceFicha];
     var treino = ficha.treinos[indiceTreino];
