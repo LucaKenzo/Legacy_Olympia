@@ -1,4 +1,4 @@
-var fichaModel = require("../models/fichaModel");
+var fichaModel = require("../models/fichasModel");
 
 function montarValoresExercicios(listaExercicios, idTreino) {
     var partes = [];

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="./assets/icon/favicon2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legacy Olympia | Fichas & Treino</title>
+
+    <link rel="stylesheet" href="./css/dashboards.css">
+    <link rel="stylesheet" href="./css/estilo.css">
+    <script src="./js/sessao.js"></script>
+
+    <style>
+        .secao-box {
+            background-color: #1f1f23;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .secao-box h2 {
+            margin-top: 0;
+            border-left: 4px solid #e60026;
+            padding-left: 12px;
+        }
+
+        .filtros-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .btn-filtro {
+            background-color: #2c2c32;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-filtro.ativo {
+            background-color: #e60026;
+            border-color: #e60026;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .card-ficha {
+            background-color: #27272c;
+            border: 1px solid #383840;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-ficha h3 {
+            margin: 0 0 6px;
+            color: #fff;
+        }
+
+        .tag-objetivo {
+            display: inline-block;
+            background-color: #e60026;
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: fit-content;
+        }
+
+        .lista-exercicios-preview {
+            font-size: 0.88rem;
+            color: #ccc;
+            padding-left: 18px;
+            margin: 10px 0 16px;
+        }
+
+        .treino-bloco {
+            background-color: #27272c;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .exercicio-linha {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #383840;
+        }
+
+        .exercicio-linha:last-child {
+            border-bottom: none;
+        }
+
+        .inputs-serie {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .inputs-serie input,
+        .inputs-serie select {
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background-color: #18181b;
+            color: #fff;
+            width: 85px;
+        }
+
+        .btn-acao {
+            background-color: #e60026;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-acao:hover {
+            background-color: #c20020;
+        }
+
+        .mensagem-status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body onload="validarSessao(); renderizarFichasProntas('Todos'); carregarFichaAtiva();">
+
+    <div class="janela">
+        <div class="header-left">
+            <h1>Legacy Olympia</h1>
+
+            <div class="hello">
+                <h3>Olá, <span id="b_usuario">atleta</span>!</h3>
+            </div>
+
+            <div class="btn-nav-white">
+                <a href="./dashboard.html">
+                    <h3>Dashboard</h3>
+                </a>
+            </div>
+
+            <div class="btn-nav">
+                <h3>Fichas de Treino</h3>
+            </div>
+
+            <div class="btn-nav-white">
+                <a href="./index.html">
+                    <h3>Início</h3>
+                </a>
+            </div>
+
+            <div class="btn-logout" onclick="limparSessao()">
+                <h3>Sair</h3>
+            </div>
+        </div>
+
+        <div class="dash" style="padding: 24px; overflow-y: auto;">
+
+            <!-- SEÇÃO 1: FICHA ATIVA E REGISTRO DO TREINO DO DIA -->
+            <div class="secao-box">
+                <h2>Minha Ficha Ativa & Registrar Treino do Dia</h2>
+                <div id="div_mensagem_serie" class="mensagem-status"></div>
+                <div id="div_ficha_ativa">
+                    <p style="color: #aaa;">Carregando sua ficha ativa...</p>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2: ESCOLHER FICHA PRÉ-MONTADA -->
+            <div class="secao-box">
+                <h2>Fichas Pré-Montadas (Escolha sua Rotina)</h2>
+                <p style="color: #ccc; margin-bottom: 14px;">
+                    Selecione uma ficha estruturada abaixo para ativá-la no seu perfil e começar a registrar suas cargas.
+                </p>
+
+                <div class="filtros-bar">
+                    <button class="btn-filtro ativo" onclick="filtrarFichas('Todos', this)">Todas</button>
+                    <button class="btn-filtro" onclick="filtrarFichas('Corpo todo', this)">Iniciante (Corpo Todo)</button>
+                    <button class="btn-filtro" onclick="filtrarFichas('Peito', this)">Superiores (Peito & Braços)</button>
+                    <button class="btn-filtro" onclick="filtrarFichas('Pernas', this)">Inferiores (Pernas)</button>
+                </div>
+
+                <div id="div_mensagem_ficha" class="mensagem-status"></div>
+                <div id="div_lista_fichas" class="grid-cards"></div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script>
+    // VETOR DE FICHAS PRÉ-MONTADAS (Estrutura de Dados em JS)
+    var fichasProntas = [
+        {
+            titulo: "Iniciante - Base Olympia AB",
+            objetivo: "Corpo todo",
+            nivel: "Iniciante",
+            descricao: "Divisão AB equilibrada para construir força e técnica nos exercícios fundamentais.",
+            treinos: [
+                {
+                    titulo: "Treino A - Empurrar & Quadríceps",
+                    observacao: "Foco na execução controlada e postura.",
+                    exercicios: [
+                        { nome: "Supino Reto", descricao: "3x12 reps", musculo: "Peito", equipamento: "Barra" },
+                        { nome: "Desenvolvimento", descricao: "3x12 reps", musculo: "Ombro", equipamento: "Halteres" },
+                        { nome: "Tríceps Corda", descricao: "3x12 reps", musculo: "Triceps", equipamento: "Maquina" },
+                        { nome: "Leg Press 45", descricao: "3x15 reps", musculo: "Quadriceps", equipamento: "Maquina" }
+                    ]
+                },
+                {
+                    titulo: "Treino B - Puxar & Posterior",
+                    observacao: "Manter escápulas encaixadas.",
+                    exercicios: [
+                        { nome: "Puxada Aberta", descricao: "3x12 reps", musculo: "Costas", equipamento: "Maquina" },
+                        { nome: "Rosca Direta", descricao: "3x12 reps", musculo: "Biceps", equipamento: "Barra" },
+                        { nome: "Mesa Flexora", descricao: "3x12 reps", musculo: "Posterior", equipamento: "Maquina" },
+                        { nome: "Abdominal Supra", descricao: "3x15 reps", musculo: "Abdominal", equipamento: "Colchonete" }
+                    ]
+                }
+            ]
+        },
+        {
+            titulo: "Hipertrofia Clássica - Superiores",
+            objetivo: "Peito",
+            nivel: "Intermediário",
+            descricao: "Rotina inspirada na Era de Ouro para quebrar estagnação em tronco e braços.",
+            treinos: [
+                {
+                    titulo: "Treino A - Peito e Ombros",
+                    observacao: "Progressão de carga nas últimas séries.",
+                    exercicios: [
+                        { nome: "Supino Inclinado", descricao: "4x10 reps", musculo: "Peito", equipamento: "Barra" },
+                        { nome: "Crucifixo Reto", descricao: "3x12 reps", musculo: "Peito", equipamento: "Halteres" },
+                        { nome: "Elevação Lateral", descricao: "4x12 reps", musculo: "Ombro", equipamento: "Halteres" }
+                    ]
+                },
+                {
+                    titulo: "Treino B - Costas e Braços",
+                    observacao: "Intervalo curto para máximo pump.",
+                    exercicios: [
+                        { nome: "Remada Curvada", descricao: "4x10 reps", musculo: "Costas", equipamento: "Barra" },
+                        { nome: "Rosca Alternada", descricao: "3x10 reps", musculo: "Biceps", equipamento: "Halteres" },
+                        { nome: "Tríceps Testa", descricao: "3x10 reps", musculo: "Triceps", equipamento: "Barra" }
+                    ]
+                }
+            ]
+        },
+        {
+            titulo: "Leg Day Completo - Tom Platz",
+            objetivo: "Pernas",
+            nivel: "Experiente",
+            descricao: "Foco total em membros inferiores com alto volume e intensidade.",
+            treinos: [
+                {
+                    titulo: "Treino A - Quadríceps & Panturrilha",
+                    observacao: "Amplitude máxima no agachamento.",
+                    exercicios: [
+                        { nome: "Agachamento Livre", descricao: "4x8 reps", musculo: "Quadriceps", equipamento: "Barra" },
+                        { nome: "Cadeira Extensora", descricao: "4x12 reps", musculo: "Quadriceps", equipamento: "Maquina" },
+                        { nome: "Panturrilha em Pé", descricao: "4x15 reps", musculo: "Panturrilha", equipamento: "Maquina" }
+                    ]
+                },
+                {
+                    titulo: "Treino B - Posterior & Glúteo",
+                    observacao: "Alongamento controlado no Stiff.",
+                    exercicios: [
+                        { nome: "Stiff com Barra", descricao: "4x10 reps", musculo: "Posterior", equipamento: "Barra" },
+                        { nome: "Mesa Flexora", descricao: "4x12 reps", musculo: "Posterior", equipamento: "Maquina" },
+                        { nome: "Elevação Pélvica", descricao: "4x10 reps", musculo: "Gluteo", equipamento: "Barra" }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    function filtrarFichas(objetivoFiltro, botaoClicado) {
+        var botoes = document.querySelectorAll(".btn-filtro");
+        for (var i = 0; i < botoes.length; i++) {
+            botoes[i].classList.remove("ativo");
+        }
+        botaoClicado.classList.add("ativo");
+        renderizarFichasProntas(objetivoFiltro);
+    }
+
+    function renderizarFichasProntas(objetivoFiltro) {
+        var container = document.getElementById("div_lista_fichas");
+        container.innerHTML = "";
+
+        for (var i = 0; i < fichasProntas.length; i++) {
+            var ficha = fichasProntas[i];
+
+            if (objetivoFiltro === "Todos" || ficha.objetivo === objetivoFiltro) {
+                var htmlExercicios = "";
+                for (var t = 0; t < ficha.treinos.length; t++) {
+                    htmlExercicios += `<li><strong>${ficha.treinos[t].titulo}</strong> (${ficha.treinos[t].exercicios.length} exercícios)</li>`;
+                }
+
+                container.innerHTML += `
+                    <div class="card-ficha">
+                        <div>
+                            <span class="tag-objetivo">${ficha.nivel} • ${ficha.objetivo}</span>
+                            <h3>${ficha.titulo}</h3>
+                            <p style="font-size: 0.9rem; color: #bbb;">${ficha.descricao}</p>
+                            <ul class="lista-exercicios-preview">${htmlExercicios}</ul>
+                        </div>
+                        <button class="btn-acao" onclick="ativarFicha(${i})">Ativar Esta Ficha</button>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    function ativarFicha(indiceVetor) {
+        var idUsuario = sessionStorage.ID_USUARIO;
+        var fichaSelecionada = fichasProntas[indiceVetor];
+        var msg = document.getElementById("div_mensagem_ficha");
+
+        msg.style.color = "#f39c12";
+        msg.innerHTML = "Ativando ficha no banco de dados...";
+
+        fetch("/fichas/escolher", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                idUsuarioServer: idUsuario,
+                tituloServer: fichaSelecionada.titulo,
+                objetivoServer: fichaSelecionada.objetivo,
+                descricaoServer: fichaSelecionada.descricao,
+                treinosServer: fichaSelecionada.treinos
+            })
+        })
+            .then(function (resposta) {
+                if (resposta.ok) {
+                    msg.style.color = "#2ecc71";
+                    msg.innerHTML = "✅ Ficha ativada com sucesso! Veja os exercícios acima para registrar seu treino.";
+                    carregarFichaAtiva();
+                } else {
+                    msg.style.color = "#e74c3c";
+                    msg.innerHTML = "❌ Erro ao ativar a ficha.";
+                }
+            })
+            .catch(function (erro) {
+                console.log(erro);
+                msg.style.color = "#e74c3c";
+                msg.innerHTML = "❌ Falha na comunicação com o servidor.";
+            });
+    }
+
+    function carregarFichaAtiva() {
+        var idUsuario = sessionStorage.ID_USUARIO;
+        var container = document.getElementById("div_ficha_ativa");
+
+        fetch(`/fichas/ativa/${idUsuario}`, { cache: "no-store" })
+            .then(function (resposta) {
+                if (resposta.ok) {
+                    resposta.json().then(function (linhas) {
+                        if (linhas.length === 0) {
+                            container.innerHTML = `<p style="color: #ccc;">Você ainda não ativou nenhuma ficha. Escolha uma opção abaixo para começar!</p>`;
+                            return;
+                        }
+
+                        var html = `
+                            <p style="color: #2ecc71; font-weight: bold; margin-bottom: 12px;">
+                                Ficha Atual: ${linhas[0].tituloFicha} (${linhas[0].objetivoFicha})
+                            </p>
+                        `;
+
+                        var idTreinoAtual = -1;
+
+                        for (var i = 0; i < linhas.length; i++) {
+                            var item = linhas[i];
+
+                            if (item.idTreino !== idTreinoAtual) {
+                                if (idTreinoAtual !== -1) {
+                                    html += `</div>`;
+                                }
+                                idTreinoAtual = item.idTreino;
+                                html += `
+                                    <div class="treino-bloco">
+                                        <h3 style="margin-top: 0; color: #ff4d6d;">${item.tituloTreino}</h3>
+                                        <p style="font-size: 0.85rem; color: #aaa; margin-top: -8px;">${item.observacaoTreino || ""}</p>
+                                `;
+                            }
+
+                            html += `
+                                <div class="exercicio-linha">
+                                    <div>
+                                        <strong>${item.nomeExercicio}</strong>
+                                        <span style="color: #aaa; font-size: 0.85rem;"> • ${item.musculo} (${item.equipamento})</span>
+                                    </div>
+                                    <div class="inputs-serie">
+                                        <input type="number" id="reps_${item.idExercicio}" placeholder="Reps" min="1" max="100">
+                                        <input type="number" id="carga_${item.idExercicio}" placeholder="Carga (kg)" step="0.5" min="1" max="500">
+                                        <select id="descanso_${item.idExercicio}">
+                                            <option value="00:01:00">60s descanso</option>
+                                            <option value="00:01:30" selected>90s descanso</option>
+                                            <option value="00:02:00">120s descanso</option>
+                                        </select>
+                                        <button class="btn-acao" onclick="registrarSerie(${item.idExercicio}, '${item.nomeExercicio}')">
+                                            + Registrar Série
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        html += `</div>`;
+                        container.innerHTML = html;
+                    });
+                }
+            })
+            .catch(function (erro) {
+                console.log("Erro ao carregar ficha ativa:", erro);
+            });
+    }
+
+    function registrarSerie(idExercicio, nomeExercicio) {
+        var reps = Number(document.getElementById(`reps_${idExercicio}`).value);
+        var carga = Number(document.getElementById(`carga_${idExercicio}`).value);
+        var descanso = document.getElementById(`descanso_${idExercicio}`).value;
+        var msg = document.getElementById("div_mensagem_serie");
+
+        if (reps <= 0 || carga <= 0) {
+            msg.style.color = "#e74c3c";
+            msg.innerHTML = `⚠️ Informe repetições e carga válidas para ${nomeExercicio}.`;
+            return;
+        }
+
+        // Operação Matemática: Volume levantado na série (Carga x Repetições)
+        var volumeSerie = (carga * reps).toFixed(1);
+
+        fetch("/fichas/registrar-serie", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                fkExercicioServer: idExercicio,
+                tempoDescansoServer: descanso,
+                repeticoesServer: reps,
+                cargaRealizadaServer: carga
+            })
+        })
+            .then(function (resposta) {
+                if (resposta.ok) {
+                    msg.style.color = "#2ecc71";
+                    msg.innerHTML = `✅ Série registrada em ${nomeExercicio}: ${reps} reps x ${carga} kg (Volume: ${volumeSerie} kg). Atualize a Dashboard para ver os gráficos!`;
+                    document.getElementById(`reps_${idExercicio}`).value = "";
+                    document.getElementById(`carga_${idExercicio}`).value = "";
+                } else {
+                    msg.style.color = "#e74c3c";
+                    msg.innerHTML = "❌ Erro ao registrar série no banco.";
+                }
+            })
+            .catch(function (erro) {
+                console.log(erro);
+                msg.style.color = "#e74c3c";
+                msg.innerHTML = "❌ Erro de conexão ao registrar série.";
+            });
+    }
+</script>
