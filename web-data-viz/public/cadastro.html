@@ -35,6 +35,9 @@
         <label>E-mail</label>
         <input type="email" id="email_input" placeholder="seuemail@exemplo.com">
 
+        <label>Peso Atual (kg)</label>
+        <input type="number" id="peso_input" step="0.1" min="20" max="99.9" placeholder="Ex: 78.5">
+
         <label>Senha</label>
         <input type="password" id="senha_input" placeholder="Crie uma senha">
 
@@ -60,7 +63,7 @@
   }
 
   function campoNull(campos) {
-    for (let i = 0; i < campos.length; i++) {
+    for (var i = 0; i < campos.length; i++) {
       if (campos[i].trim() === "") {
         return true;
       }
@@ -69,7 +72,11 @@
   }
 
   function validar(campos) {
-    const [nome, email, senha, confirmacaoSenha] = campos;
+    var nome = campos[0];
+    var email = campos[1];
+    var peso = Number(campos[2]);
+    var senha = campos[3];
+    var confirmacaoSenha = campos[4];
 
     if (campoNull(campos)) {
       mostrarMensagem("Todos os campos devem ser preenchidos!", "erro");
@@ -81,8 +88,13 @@
       return false;
     }
 
-    if (!email.includes("@") || !email.includes(".")) {
-      mostrarMensagem("Informe um e-mail válido.", "erro");
+    if (!email.includes("@") || !email.includes(".com")) {
+      mostrarMensagem("Informe um e-mail válido (ex: nome@email.com).", "erro");
+      return false;
+    }
+
+    if (isNaN(peso) || peso <= 0 || peso >= 100) {
+      mostrarMensagem("Informe um peso válido entre 1 e 99.9 kg.", "erro");
       return false;
     }
 
@@ -102,10 +114,11 @@
   function cadastrar() {
     var nomeVar = nome_input.value;
     var emailVar = email_input.value;
+    var pesoVar = peso_input.value;
     var senhaVar = senha_input.value;
     var confirmacaoSenhaVar = confirmacao_senha_input.value;
 
-    const campos = [nomeVar, emailVar, senhaVar, confirmacaoSenhaVar];
+    var campos = [nomeVar, emailVar, pesoVar, senhaVar, confirmacaoSenhaVar];
 
     if (!validar(campos)) return false;
 
@@ -115,6 +128,7 @@
       body: JSON.stringify({
         nomeServer: nomeVar,
         emailServer: emailVar,
+        pesoServer: Number(pesoVar),
         senhaServer: senhaVar
       })
     })

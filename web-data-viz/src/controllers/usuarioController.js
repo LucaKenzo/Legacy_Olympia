@@ -36,16 +36,19 @@ function autenticar(req, res) {
 function cadastrar(req, res) {
     var nome = req.body.nomeServer;
     var email = req.body.emailServer;
+    var peso = req.body.pesoServer;
     var senha = req.body.senhaServer;
 
     if (nome == undefined || nome.trim() === "") {
         res.status(400).send("Seu nome está undefined!");
     } else if (email == undefined || email.trim() === "") {
         res.status(400).send("Seu email está undefined!");
+    } else if (peso == undefined || peso <= 0) {
+        res.status(400).send("Seu peso está inválido!");
     } else if (senha == undefined || senha.trim() === "") {
         res.status(400).send("Sua senha está undefined!");
     } else {
-        usuarioModel.cadastrar(nome.trim(), email.trim(), senha)
+        usuarioModel.cadastrar(nome.trim(), email.trim(), senha, peso)
             .then(function (resultado) {
                 res.status(201).json(resultado);
             })

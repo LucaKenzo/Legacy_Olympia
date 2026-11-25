@@ -9,11 +9,12 @@ function autenticar(email, senha) {
     return database.executar(instrucaoSql);
 }
 
-function cadastrar(nome, email, senha) {
-    console.log("ACESSEI O USUARIO MODEL - function cadastrar():", nome, email, senha);
+function cadastrar(nome, email, senha, peso) {
+    console.log("ACESSEI O USUARIO MODEL - function cadastrar():", nome, email, senha, peso);
 
     var instrucaoSql = `
-        INSERT INTO usuario (nome, email, senha) VALUES ('${nome}', '${email}', '${senha}');
+        INSERT INTO usuario (nome, email, senha, peso, dataTreino)
+        VALUES ('${nome}', '${email}', '${senha}', ${peso}, CURDATE());
     `;
     console.log("Executando a instrução SQL: \n" + instrucaoSql);
     return database.executar(instrucaoSql);

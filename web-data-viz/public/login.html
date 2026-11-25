@@ -2,157 +2,109 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AquaTech | Login</title>
-
-    <script src="./js/sessao.js"></script>
-
-    <link rel="stylesheet" href="./css/estilo.css">
-    <link rel="icon" href="./assets/icon/favicon2.ico">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legacy Olympia | Login</title>
+  <link rel="stylesheet" href="./css/estilo.css">
+  <link rel="icon" href="./assets/icon/favicon2.ico">
 </head>
 
 <body>
+  <div class="auth">
 
-    <!--Header-->
-
-    <div class="header">
-        <div class="container">
-            <h1 class="titulo">AquaTech</h1>
-            <ul class="navbar">
-                <li>
-                    <a href="index.html">Inicial</a>
-                </li>
-                <li>
-                    <a href="simulador.html">Simulador</a>
-                </li>
-                <li>|</li>
-                <li class="agora">
-                    <a href="#">Login</a>
-                </li>
-                <li>
-                    <a href="cadastro.html">Cadastro</a>
-                </li>
-            </ul>
-        </div>
+    <div class="auth-imagem">
+      <img src="./assets/logo-legacy-olympia.png" alt="Legacy Olympia" class="logo">
+      <div>
+        <p class="vermelho pequeno">FORÇA. HONRA. LEGADO.</p>
+        <h1>Forje seu legado aqui.</h1>
+        <p>Treine com propósito. Registre cada conquista. Construa um legado que é só seu.</p>
+        <p class="cinza pequeno">FEITO PARA CAMPEÕES. EST. 2026 / BRASIL</p>
+      </div>
     </div>
 
+    <div class="auth-form">
+      <p class="cinza pequeno" style="text-align: right;">Ainda não tem uma conta? <a href="cadastro.html" class="vermelho">Cadastre-se →</a></p>
 
-    <div class="login">
-        <div class="alerta_erro">
-            <div class="card_erro" id="cardErro">
-                <span id="mensagem_erro"></span>
-            </div>
-        </div>
-        <div class="container">
-            <div class="card card-login">
-                <h2>Olá de volta!</h2>
-                <div class="formulario">
-                    <div class="campo">
-                        <span>E-mail:</span>
-                        <input id="email_input" type="text" placeholder="Login">
-                    </div>
-                    <div class="campo">
-                        <span>Senha:</span>
-                        <input id="senha_input" type="password" placeholder="******">
-                    </div>
-                    <button class="botao" onclick="entrar()">Entrar</button>
-                </div>
+      <form onsubmit="entrar(); return false">
+        <p class="vermelho pequeno">BEM-VINDO DE VOLTA</p>
+        <h1>Continue sua jornada.</h1>
+        <p class="cinza">Acesse sua conta para consultar suas fichas, registrar seus treinos e acompanhar sua evolução.</p>
 
-                <div id="div_aguardar" class="loading-div">
-                    <img src="./assets/circle-loading.gif" id="loading-gif">
-                </div>
+        <label>E-mail</label>
+        <input type="email" id="email_input" placeholder="seuemail@exemplo.com">
 
-                <div id="div_erros_login"></div>
-            </div>
-        </div>
+        <label>Senha</label>
+        <input type="password" id="senha_input" placeholder="Digite sua senha">
+
+        <div id="div_mensagem" class="mensagem"></div>
+
+        <button type="submit" class="botao">→ ENTRAR NA MINHA CONTA</button>
+      </form>
     </div>
 
-    <!--footer inicio-->
-    <div class="footer">
-        <div class="container">
-            <h4>Feito com amor por aluno &hearts; SPTech &copy; 2023-2026</h4>
-        </div>
-    </div>
-    <!--footer fim-->
-
+  </div>
 </body>
 
 </html>
 
 <script>
+  function mostrarMensagem(texto, tipo) {
+    div_mensagem.innerHTML = texto;
+    div_mensagem.className = "mensagem " + tipo;
+  }
 
-
-    function entrar() {
-        aguardar();
-
-        var emailVar = email_input.value;
-        var senhaVar = senha_input.value;
-
-        if (emailVar == "" || senhaVar == "") {
-            cardErro.style.display = "block"
-            mensagem_erro.innerHTML = "(Mensagem de erro para todos os campos em branco)";
-            finalizarAguardar();
-            return false;
-        }
-        else {
-            setInterval(sumirMensagem, 5000)
-        }
-
-        console.log("FORM LOGIN: ", emailVar);
-        console.log("FORM SENHA: ", senhaVar);
-
-        fetch("/usuarios/autenticar", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                emailServer: emailVar,
-                senhaServer: senhaVar
-            })
-        }).then(function (resposta) {
-            console.log("ESTOU NO THEN DO entrar()!")
-
-            if (resposta.ok) {
-                console.log(resposta);
-
-                resposta.json().then(json => {
-                    console.log(json);
-                    console.log(JSON.stringify(json));
-                    sessionStorage.EMAIL_USUARIO = json.email;
-                    sessionStorage.NOME_USUARIO = json.nome;
-                    sessionStorage.ID_USUARIO = json.id;
-                    sessionStorage.AQUARIOS = JSON.stringify(json.aquarios)
-
-                    setTimeout(function () {
-                        window.location = "./dashboard/cards.html";
-                    }, 1000); // apenas para exibir o loading
-
-                });
-
-            } else {
-
-                console.log("Houve um erro ao tentar realizar o login!");
-
-                resposta.text().then(texto => {
-                    console.error(texto);
-                    finalizarAguardar(texto);
-                });
-            }
-
-        }).catch(function (erro) {
-            console.log(erro);
-        })
-
-        return false;
+  function validar(email, senha) {
+    if (email.trim() === "" || senha.trim() === "") {
+      mostrarMensagem("Preencha o e-mail e a senha para entrar!", "erro");
+      return false;
     }
 
-    function sumirMensagem() {
-        cardErro.style.display = "none"
+    if (!email.includes("@") || !email.includes(".")) {
+      mostrarMensagem("Informe um e-mail válido.", "erro");
+      return false;
     }
 
+    return true;
+  }
+
+  function entrar() {
+    var emailVar = email_input.value;
+    var senhaVar = senha_input.value;
+
+    if (!validar(emailVar, senhaVar)) return false;
+
+    fetch("/usuarios/autenticar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        emailServer: emailVar.trim(),
+        senhaServer: senhaVar
+      })
+    })
+      .then(function (resposta) {
+        if (resposta.ok) {
+          resposta.json().then(function (json) {
+            sessionStorage.EMAIL_USUARIO = json.email;
+            sessionStorage.NOME_USUARIO = json.nome;
+            sessionStorage.ID_USUARIO = json.id;
+
+            mostrarMensagem("✅ Login realizado com sucesso! Redirecionando...", "ok");
+
+            setTimeout(function () {
+              window.location = "fichas.html";
+            }, 1200);
+          });
+        } else {
+          resposta.text().then(function (texto) {
+            mostrarMensagem("❌ " + (texto || "E-mail e/ou senha inválidos."), "erro");
+          });
+        }
+      })
+      .catch(function (erro) {
+        console.log(erro);
+        mostrarMensagem("❌ Não foi possível se conectar ao servidor.", "erro");
+      });
+
+    return false;
+  }
 </script>
