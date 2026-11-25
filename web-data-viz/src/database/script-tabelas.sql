@@ -1,6 +1,6 @@
 CREATE DATABASE legacyOlympia;
 USE legacyOlympia;
-drop database legacyolympia;
+drop database legacyOlympia;
 
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
