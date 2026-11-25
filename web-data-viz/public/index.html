@@ -4,8 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Legacy Olympia | Página Inicial</title>
+  <title>Legacy Olympia | Login</title>
   <link rel="stylesheet" href="./css/estilo.css">
+  <link rel="icon" href="./assets/icon/favicon2.ico">
 </head>
 
 <body>
@@ -16,21 +17,97 @@
       <div>
         <p class="vermelho pequeno">FORÇA. HONRA. LEGADO.</p>
         <h1>Forje seu legado aqui.</h1>
-        <p>Fichas de treino prontas, histórico de treinos e controle de peso.</p>
+        <p>Treine com propósito. Registre cada conquista. Construa um legado que é só seu.</p>
+        <p class="cinza pequeno">FEITO PARA CAMPEÕES. EST. 2026 / BRASIL</p>
       </div>
     </div>
 
     <div class="auth-form">
-      <h2>Comece agora</h2>
-      <p class="cinza">Escolha uma ficha, registre seus treinos e acompanhe sua evolução.</p>
-      <p>
-        <a href="cadastro.html" class="botao">→ Criar minha conta</a>
-        <a href="login.html" class="botao borda">Entrar</a>
-      </p>
-      <p class="cinza pequeno">As fichas são referências gerais e não substituem a orientação de um profissional de educação física.</p>
+      <p class="cinza pequeno" style="text-align: right;">Ainda não tem uma conta? <a href="cadastro.html" class="vermelho">Cadastre-se →</a></p>
+
+      <form onsubmit="entrar(); return false">
+        <p class="vermelho pequeno">BEM-VINDO DE VOLTA</p>
+        <h1>Continue sua jornada.</h1>
+        <p class="cinza">Acesse sua conta para consultar suas fichas, registrar seus treinos e acompanhar sua evolução.</p>
+
+        <label>E-mail</label>
+        <input type="email" id="email_input" placeholder="seuemail@exemplo.com">
+
+        <label>Senha</label>
+        <input type="password" id="senha_input" placeholder="Digite sua senha">
+
+        <div id="div_mensagem" class="mensagem"></div>
+
+        <button type="submit" class="botao">→ ENTRAR NA MINHA CONTA</button>
+      </form>
+
     </div>
 
   </div>
 </body>
 
 </html>
+
+<script>
+  function mostrarMensagem(texto, tipo) {
+    div_mensagem.innerHTML = texto;
+    div_mensagem.style.color = tipo === "ok" ? "#2ecc71" : "#e74c3c";
+  }
+
+  function validar(email, senha) {
+    if (email.trim() === "" || senha.trim() === "") {
+      mostrarMensagem("Preencha o e-mail e a senha para entrar!", "erro");
+      return false;
+    }
+
+    if (!email.includes("@") || !email.includes(".")) {
+      mostrarMensagem("Informe um e-mail válido.", "erro");
+      return false;
+    }
+
+    return true;
+  }
+
+  function entrar() {
+    var emailVar = email_input.value;
+    var senhaVar = senha_input.value;
+
+    if (!validar(emailVar, senhaVar)) return false;
+
+    fetch("/usuarios/autenticar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        emailServer: emailVar.trim(),
+        senhaServer: senhaVar
+      })
+    })
+      .then(function (resposta) {
+        if (resposta.ok) {
+          resposta.json().then(function (json) {
+            sessionStorage.EMAIL_USUARIO = json.email;
+            sessionStorage.NOME_USUARIO = json.nome;
+            sessionStorage.ID_USUARIO = json.id;
+
+            mostrarMensagem("✅ Login realizado com sucesso! Redirecionando...", "ok");
+
+            setTimeout(function () {
+              window.location = "fichas.html";
+            }, 1500);
+          });
+        } else {
+          resposta.text().then(function (texto) {
+            mostrarMensagem("❌ " + (texto || "E-mail e/ou senha inválidos."), "erro");
+          });
+        }
+      })
+      .catch(function (erro) {
+        console.log(erro);
+        mostrarMensagem("❌ Não foi possível se conectar ao servidor.", "erro");
+      });
+
+    return false;
+  }
+</script>

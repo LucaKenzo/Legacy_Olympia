@@ -1,15 +1,17 @@
-create database legacyOlympia;
-use legacyOlympia;
+CREATE DATABASE legacyOlympia;
+USE legacyOlympia;
+drop database legacyolympia;
 
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(100) NOT NULL,
-    peso DECIMAL(4,2) NOT NULL,
-    dataTreino DATE NOT NULL,
-    CONSTRAINT chkEmail CHECK (email LIKE '%@%' AND email LIKE '%.com')
+    peso DECIMAL(5,2) NULL,
+    dataTreino DATE NULL,
+    CONSTRAINT chkEmail CHECK (email LIKE '%@%.%')
 );
+select * from usuario;
 
 CREATE TABLE ficha (
     id INT PRIMARY KEY AUTO_INCREMENT,
