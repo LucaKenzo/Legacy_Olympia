@@ -4,7 +4,7 @@ var ambiente_processo = 'producao';
 var path = require("path");
 var caminho_env = ambiente_processo === 'producao' ? '.env' : '.env.dev';
 
-require("dotenv").config({ path: path.join(__dirname, caminho_env) });
+require("dotenv").config({ path: caminho_env });
 
 var express = require("express");
 var cors    = require("cors");
