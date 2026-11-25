@@ -3,6 +3,10 @@ var router = express.Router();
 
 var fichaController = require("../controllers/fichaController");
 
+router.get("/catalogo", function (req, res) {
+    fichaController.listarCatalogo(req, res);
+});
+
 router.post("/escolher", function (req, res) {
     fichaController.escolherFicha(req, res);
 });

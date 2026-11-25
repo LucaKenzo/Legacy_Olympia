@@ -2,299 +2,248 @@
 <html lang="pt-br">
 
 <head>
-    <link rel="shortcut icon" href="./assets/icon/favicon2.ico" type="image/x-icon">
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legacy Olympia | Dashboard</title>
-
-    <link rel="stylesheet" href="./css/dashboards.css">
-    <link rel="stylesheet" href="./css/estilo.css">
-    <script src="./js/sessao.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        .kpis-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-            width: 100%;
-        }
-
-        .kpi-card {
-            background-color: #1f1f23;
-            border-left: 4px solid #e60026;
-            border-radius: 8px;
-            padding: 18px;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .kpi-card span {
-            font-size: 0.85rem;
-            color: #a0a0a8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-card h2 {
-            margin: 8px 0 0;
-            font-size: 1.6rem;
-            color: #ffffff;
-        }
-
-        .graficos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 20px;
-            width: 100%;
-        }
-
-        .card-grafico {
-            background-color: #1f1f23;
-            border-radius: 8px;
-            padding: 20px;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-grafico h3 {
-            margin-top: 0;
-            margin-bottom: 14px;
-            font-size: 1.05rem;
-            color: #f1f1f1;
-        }
-
-        .aviso-vazio {
-            background-color: #2a1d20;
-            border: 1px solid #e60026;
-            color: #f8d7da;
-            padding: 14px 18px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legacy Olympia | Dashboard</title>
+  <link rel="stylesheet" href="./css/estilo.css">
+  <link rel="icon" href="./assets/icon/favicon2.ico">
+  <script src="./js/sessao.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body onload="validarSessao(); carregarDashboard();">
 
-    <div class="janela">
-        <div class="header-left">
-            <h1>Legacy Olympia</h1>
-
-            <div class="hello">
-                <h3>Olá, <span id="b_usuario">atleta</span>!</h3>
-            </div>
-
-            <div class="btn-nav">
-                <h3>Dashboard</h3>
-            </div>
-
-            <div class="btn-nav-white">
-                <a href="./fichas.html">
-                    <h3>Fichas de Treino</h3>
-                </a>
-            </div>
-
-            <div class="btn-nav-white">
-                <a href="./index.html">
-                    <h3>Início</h3>
-                </a>
-            </div>
-
-            <div class="btn-logout" onclick="limparSessao()">
-                <h3>Sair</h3>
-            </div>
-        </div>
-
-        <div class="dash" style="padding: 24px; overflow-y: auto;">
-            <div id="div_aviso_vazio" class="aviso-vazio">
-                Você ainda não possui séries registradas no banco de dados. Escolha uma ficha e registre seu primeiro treino para visualizar a evolução nos gráficos!
-            </div>
-
-            <div class="kpis-container">
-                <div class="kpi-card">
-                    <span>Ficha Ativa</span>
-                    <h2 id="kpi_ficha_ativa">-</h2>
-                </div>
-                <div class="kpi-card">
-                    <span>Séries Realizadas</span>
-                    <h2 id="kpi_total_series">0</h2>
-                </div>
-                <div class="kpi-card">
-                    <span>Volume Total Levantado</span>
-                    <h2 id="kpi_volume_total">0 kg</h2>
-                </div>
-                <div class="kpi-card">
-                    <span>Maior Carga Registrada</span>
-                    <h2 id="kpi_maior_carga">0 kg</h2>
-                </div>
-            </div>
-
-            <div class="graficos-grid">
-                <div class="card-grafico">
-                    <h3>Evolução de Carga (kg) por Treino</h3>
-                    <canvas id="graficoEvolucaoCarga"></canvas>
-                </div>
-
-                <div class="card-grafico">
-                    <h3>Séries Realizadas por Semana</h3>
-                    <canvas id="graficoSeriesSemana"></canvas>
-                </div>
-
-                <div class="card-grafico">
-                    <h3>Séries por Grupo Muscular</h3>
-                    <canvas id="graficoMusculos"></canvas>
-                </div>
-            </div>
-        </div>
+  <!-- TOPO ORIGINAL DO ESTILO.CSS -->
+  <div class="topo">
+    <div class="container linha">
+      <a href="index.html">
+        <img src="./assets/logo-legacy-olympia.png" alt="Legacy Olympia" class="logo-topo">
+      </a>
+      <div class="menu">
+        <span class="cinza">Olá, <strong id="b_usuario" class="vermelho">atleta</strong></span>
+        <a href="dashboard.html" class="ativo">Dashboard</a>
+        <a href="fichas.html">Fichas de Treino</a>
+        <a href="#" onclick="limparSessao()">Sair</a>
+      </div>
     </div>
+  </div>
+
+  <div class="container" style="margin-top: 32px;">
+
+    <div class="linha" style="margin-bottom: 20px;">
+      <div>
+        <p class="vermelho pequeno">ANÁLISE DE PERFORMANCE</p>
+        <h1>Seu Legado em Números</h1>
+      </div>
+      <a href="fichas.html" class="botao">+ REGISTRAR TREINO</a>
+    </div>
+
+    <div id="div_aviso_vazio" class="card destaque" style="display: none; margin-bottom: 20px;">
+      <p class="vermelho"><strong>Nenhuma série registrada ainda.</strong></p>
+      <p class="cinza" style="margin: 0;">Vá em <a href="fichas.html" class="vermelho">Fichas de Treino</a>, ative uma rotina e registre suas séries para acompanhar os gráficos.</p>
+    </div>
+
+    <!-- KPIS EM 4 COLUNAS (.col4) -->
+    <div class="col4">
+      <div class="card destaque">
+        <p class="cinza pequeno">FICHA ATIVA</p>
+        <h3 id="kpi_ficha_ativa">-</h3>
+      </div>
+      <div class="card">
+        <p class="cinza pequeno">SÉRIES REALIZADAS</p>
+        <h2 id="kpi_total_series">0</h2>
+      </div>
+      <div class="card">
+        <p class="cinza pequeno">VOLUME TOTAL</p>
+        <h2 id="kpi_volume_total">0 kg</h2>
+      </div>
+      <div class="card">
+        <p class="cinza pequeno">MAIOR CARGA</p>
+        <h2 id="kpi_maior_carga" class="vermelho">0 kg</h2>
+      </div>
+    </div>
+
+    <!-- GRÁFICOS EM .col2 -->
+    <div class="col2" style="margin-top: 24px;">
+      <div class="card">
+        <p class="vermelho pequeno">PROGRESSÃO DE CARGA</p>
+        <h3>Evolução de Carga (kg) por Treino</h3>
+        <canvas id="graficoEvolucaoCarga"></canvas>
+      </div>
+
+      <div class="card">
+        <p class="vermelho pequeno">FOCO MUSCULAR</p>
+        <h3>Séries por Músculo</h3>
+        <canvas id="graficoMusculos"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <p class="vermelho pequeno">CONSISTÊNCIA</p>
+      <h3>Séries Realizadas por Semana</h3>
+      <canvas id="graficoSeriesSemana" style="max-height: 260px;"></canvas>
+    </div>
+
+  </div>
+
+  <div class="rodape">
+    <div class="container linha">
+      <span>LEGACY OLYMPIA • EST. 2026 / BRASIL</span>
+      <span>Força. Honra. Legado.</span>
+    </div>
+  </div>
 
 </body>
 
 </html>
 
 <script>
-    let chartCarga = null;
-    let chartSemana = null;
-    let chartMusculos = null;
+  var chartCarga = null;
+  var chartSemana = null;
+  var chartMusculos = null;
 
-    function carregarDashboard() {
-        var idUsuario = sessionStorage.ID_USUARIO;
+  function carregarDashboard() {
+    var idUsuario = sessionStorage.ID_USUARIO;
 
-        if (!idUsuario) {
-            window.location = "login.html";
-            return;
+    if (!idUsuario) {
+      window.location = "login.html";
+      return;
+    }
+
+    fetch(`/dashboard/dados/${idUsuario}`, { cache: "no-store" })
+      .then(function (resposta) {
+        if (resposta.ok) {
+          resposta.json().then(function (dados) {
+            atualizarKpis(dados.kpis);
+            plotarEvolucaoCarga(dados.evolucaoCarga);
+            plotarSeriesSemana(dados.seriesSemana);
+            plotarMusculos(dados.distribuicaoMuscular);
+
+            if (Number(dados.kpis.totalSeries) === 0) {
+              document.getElementById("div_aviso_vazio").style.display = "block";
+            }
+          });
+        } else {
+          console.error("Erro ao buscar dados da dashboard.");
         }
+      })
+      .catch(function (erro) {
+        console.error("Erro na requisição da dashboard:", erro);
+      });
+  }
 
-        fetch(`/dashboard/dados/${idUsuario}`, { cache: "no-store" })
-            .then(function (resposta) {
-                if (resposta.ok) {
-                    resposta.json().then(function (dados) {
-                        atualizarKpis(dados.kpis);
-                        plotarEvolucaoCarga(dados.evolucaoCarga);
-                        plotarSeriesSemana(dados.seriesSemana);
-                        plotarMusculos(dados.distribuicaoMuscular);
+  function atualizarKpis(kpis) {
+    document.getElementById("kpi_ficha_ativa").innerText = kpis.fichaAtiva || "Nenhuma";
+    document.getElementById("kpi_total_series").innerText = kpis.totalSeries || 0;
+    document.getElementById("kpi_volume_total").innerText = `${kpis.volumeTotal || 0} kg`;
+    document.getElementById("kpi_maior_carga").innerText = `${kpis.maiorCarga || 0} kg`;
+  }
 
-                        if (Number(dados.kpis.totalSeries) === 0) {
-                            document.getElementById("div_aviso_vazio").style.display = "block";
-                        }
-                    });
-                } else {
-                    console.error("Erro ao buscar dados da dashboard.");
-                }
-            })
-            .catch(function (erro) {
-                console.error("Erro na requisição da dashboard:", erro);
-            });
+  function plotarEvolucaoCarga(lista) {
+    var labels = [];
+    var mediaCarga = [];
+    var cargaMaxima = [];
+
+    for (var i = 0; i < lista.length; i++) {
+      labels.push(lista[i].dataTreino);
+      mediaCarga.push(Number(lista[i].mediaCarga));
+      cargaMaxima.push(Number(lista[i].cargaMaxima));
     }
 
-    function atualizarKpis(kpis) {
-        document.getElementById("kpi_ficha_ativa").innerText = kpis.fichaAtiva || "Nenhuma";
-        document.getElementById("kpi_total_series").innerText = kpis.totalSeries || 0;
-        document.getElementById("kpi_volume_total").innerText = `${kpis.volumeTotal || 0} kg`;
-        document.getElementById("kpi_maior_carga").innerText = `${kpis.maiorCarga || 0} kg`;
+    if (chartCarga) chartCarga.destroy();
+
+    chartCarga = new Chart(document.getElementById("graficoEvolucaoCarga"), {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Carga Máxima (kg)",
+            data: cargaMaxima,
+            borderColor: "#e0143a",
+            backgroundColor: "rgba(200, 16, 46, 0.2)",
+            tension: 0.3,
+            fill: true
+          },
+          {
+            label: "Carga Média (kg)",
+            data: mediaCarga,
+            borderColor: "#8b8b93",
+            backgroundColor: "transparent",
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: "#f4f1ea" } } },
+        scales: {
+          x: { ticks: { color: "#8b8b93" }, grid: { color: "#26262b" } },
+          y: { ticks: { color: "#8b8b93" }, grid: { color: "#26262b" } }
+        }
+      }
+    });
+  }
+
+  function plotarMusculos(lista) {
+    var labels = [];
+    var valores = [];
+
+    for (var i = 0; i < lista.length; i++) {
+      labels.push(lista[i].musculo);
+      valores.push(Number(lista[i].totalSeries));
     }
 
-    function plotarEvolucaoCarga(lista) {
-        const labels = lista.map(item => item.dataTreino);
-        const mediaCarga = lista.map(item => Number(item.mediaCarga));
-        const cargaMaxima = lista.map(item => Number(item.cargaMaxima));
+    if (chartMusculos) chartMusculos.destroy();
 
-        if (chartCarga) chartCarga.destroy();
+    chartMusculos = new Chart(document.getElementById("graficoMusculos"), {
+      type: "doughnut",
+      data: {
+        labels: labels,
+        datasets: [{
+          data: valores,
+          backgroundColor: ["#c8102e", "#e0143a", "#8b8b93", "#3fb76b", "#d97706", "#4a0f1a"],
+          borderColor: "#141417",
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom", labels: { color: "#f4f1ea" } } }
+      }
+    });
+  }
 
-        chartCarga = new Chart(document.getElementById("graficoEvolucaoCarga"), {
-            type: "line",
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: "Carga Máxima (kg)",
-                        data: cargaMaxima,
-                        borderColor: "#e60026",
-                        backgroundColor: "rgba(230, 0, 38, 0.2)",
-                        tension: 0.3,
-                        fill: true
-                    },
-                    {
-                        label: "Carga Média (kg)",
-                        data: mediaCarga,
-                        borderColor: "#f39c12",
-                        backgroundColor: "transparent",
-                        tension: 0.3
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { labels: { color: "#fff" } } },
-                scales: {
-                    x: { ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.08)" } },
-                    y: { ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.08)" } }
-                }
-            }
-        });
+  function plotarSeriesSemana(lista) {
+    var labels = [];
+    var valores = [];
+
+    for (var i = 0; i < lista.length; i++) {
+      labels.push(lista[i].semana);
+      valores.push(Number(lista[i].totalSeries));
     }
 
-    function plotarSeriesSemana(lista) {
-        const labels = lista.map(item => item.semana);
-        const valores = lista.map(item => Number(item.totalSeries));
+    if (chartSemana) chartSemana.destroy();
 
-        if (chartSemana) chartSemana.destroy();
-
-        chartSemana = new Chart(document.getElementById("graficoSeriesSemana"), {
-            type: "bar",
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: "Séries Concluídas",
-                    data: valores,
-                    backgroundColor: "#e60026",
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { labels: { color: "#fff" } } },
-                scales: {
-                    x: { ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.08)" } },
-                    y: { beginAtZero: true, ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.08)" } }
-                }
-            }
-        });
-    }
-
-    function plotarMusculos(lista) {
-        const labels = lista.map(item => item.musculo);
-        const valores = lista.map(item => Number(item.totalSeries));
-
-        if (chartMusculos) chartMusculos.destroy();
-
-        chartMusculos = new Chart(document.getElementById("graficoMusculos"), {
-            type: "doughnut",
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: valores,
-                    backgroundColor: [
-                        "#e60026",
-                        "#ff5733",
-                        "#f39c12",
-                        "#2ecc71",
-                        "#3498db",
-                        "#9b59b6",
-                        "#1abc9c"
-                    ],
-                    borderWidth: 1,
-                    borderColor: "#1f1f23"
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: "bottom", labels: { color: "#fff" } } }
-            }
-        });
-    }
+    chartSemana = new Chart(document.getElementById("graficoSeriesSemana"), {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Séries Concluídas",
+          data: valores,
+          backgroundColor: "#c8102e",
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: "#f4f1ea" } } },
+        scales: {
+          x: { ticks: { color: "#8b8b93" }, grid: { color: "#26262b" } },
+          y: { beginAtZero: true, ticks: { color: "#8b8b93" }, grid: { color: "#26262b" } }
+        }
+      }
+    });
+  }
 </script>
