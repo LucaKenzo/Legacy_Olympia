@@ -62,11 +62,10 @@ function cadastrarFicha(idUsuario, objetivo, titulo, descricao) {
     return database.executar(instrucaoSql);
 }
 
-function cadastrarTreino(titulo, observacao, fkFicha, dataTreino) {
-    var valorData = dataTreino ? `'${dataTreino}'` : `CURDATE()`;
+function cadastrarTreino(titulo, observacao, fkFicha) {
     var instrucaoSql = `
-        INSERT INTO treino (titulo, observacao, fkFicha, dataTreino)
-        VALUES ('${titulo}', '${observacao}', ${fkFicha}, ${valorData});
+        INSERT INTO treino (titulo, observacao, fkFicha)
+        VALUES ('${titulo}', '${observacao}', ${fkFicha});
     `;
     return database.executar(instrucaoSql);
 }

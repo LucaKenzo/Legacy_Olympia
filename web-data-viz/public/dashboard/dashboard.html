@@ -126,13 +126,6 @@
         <canvas id="graficoMusculos"></canvas>
       </div>
     </div>
-
-    <div class="card" style="margin-top: 16px;">
-      <p class="vermelho pequeno">CONSISTÊNCIA</p>
-      <h3>Séries Realizadas por Semana</h3>
-      <canvas id="graficoSeriesSemana" style="max-height: 260px;"></canvas>
-    </div>
-
   </div>
 
   <div class="rodape">
@@ -291,7 +284,6 @@
           resposta.json().then(function (dados) {
             atualizarKpis(dados.kpis);
             plotarEvolucaoCarga(dados.evolucaoCarga);
-            plotarSeriesSemana(dados.seriesSemana);
             plotarMusculos(dados.distribuicaoMuscular);
 
             if (Number(dados.kpis.totalSeries) === 0) {
@@ -390,39 +382,6 @@
       options: {
         responsive: true,
         plugins: { legend: { position: "bottom", labels: { color: "#f4f1ea" } } }
-      }
-    });
-  }
-
-  function plotarSeriesSemana(lista) {
-    var labels = [];
-    var valores = [];
-
-    for (var i = 0; i < lista.length; i++) {
-      labels.push(lista[i].semana);
-      valores.push(Number(lista[i].totalSeries));
-    }
-
-    if (chartSemana) chartSemana.destroy();
-
-    chartSemana = new Chart(document.getElementById("graficoSeriesSemana"), {
-      type: "bar",
-      data: {
-        labels: labels,
-        datasets: [{
-          label: "Séries Concluídas",
-          data: valores,
-          backgroundColor: "#c8102e",
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: "#f4f1ea" } } },
-        scales: {
-          x: { ticks: { color: "#8b8b93" }, grid: { color: "#26262b" } },
-          y: { beginAtZero: true, ticks: { color: "#8b8b93" }, grid: { color: "#26262b" } }
-        }
       }
     });
   }
