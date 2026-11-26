@@ -10,7 +10,6 @@ CREATE TABLE usuario (
     dataTreino DATE NULL,
     CONSTRAINT chkEmail CHECK (email LIKE '%@%.%')
 );
-select * from usuario;
 
 CREATE TABLE ficha (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -124,273 +123,141 @@ FROM ficha f
 JOIN treino t ON t.fkFicha = f.id
 JOIN exercicio e ON e.fkTreino = t.id
 WHERE f.fkUsuario IS NULL;
--- -----------------------------------------------------------------------------------------------------------------------------------
 
--- ----------------------------------------------------- INSERTS , SELECTS , UPDATES , DELETES ----------------------------------------------------------------------------
+USE legacyOlympia;
 
--- Observação : selects serão feitos em blocos por tabela seguindo a seguinte estrutura
--- usuario -> ficha -> treino -> exercicio -> serie
--- Ordem de comandos DML : INSERT , SELECT , UPDATE , DELETES 
--- --------------------------------------------------------------------------------	usuario ------------------------------------------------------------------------------------------
+-- ============================================================================
+-- 1. FICHAS, TREINOS E EXERCÍCIOS (fichasModel.js)
+-- ============================================================================
 
-        SELECT id, nome, email FROM usuario WHERE email = email AND senha = senha;
-
-
-
-        SELECT DISTINCT
-         u.id AS idUsuario,
-         u.email AS email,
-         u.senha AS senha,
-		 f.id AS idFicha,
-         t.id AS idTreino
-      FROM usuario AS u
-       JOIN ficha AS f
-	  ON f.fkUsuario = u.id
-       JOIN treino AS t
-      ON t.fkFicha = f.id
-	  WHERE email = 'gui@gmail.com' AND senha = '123';
-      
-      SELECT id AS idUsuario, nome, email FROM usuario WHERE email = 'gui@gmail.com' AND senha = '123';
-
-
-SELECT * FROM usuario;
-
-SELECT * FROM usuario WHERE email = 'ju@gmail.com' AND senha ='123';
-
-
-
-
-
-
-
-
-SELECT * FROM usuario WHERE email = 'gui@gmail.com' AND senha = '123';
-
--- ------------------------------------------------ FICHAS ---------------------------------------------------------------------------------------------------------------
-
-
-
-
-
--- Conta quantas fichas o usuario tem no total
-SELECT u.nome AS 'Nome do usuario',
-         COUNT(f.titulo)  AS 'Quantidade de fichas'
-        FROM usuario AS u
-        JOIN ficha AS f
-        ON f.fkUsuario = u.id
-        WHERE u.id = 1
-        GROUP BY u.nome; -- Apenas nos campos que não tem operação matematica
-        
-   -- lista todas as fichas que o usuario tem     
-  SELECT u.nome AS 'Nome do usuario',
-        f.objetivo AS objetivo,
-        f.titulo AS titufloFicha,
-        f.status AS status,
-        f.created_at AS dataCriacao
-        FROM usuario AS u
-        JOIN ficha AS f
-        ON f.fkUsuario = u.id
-        WHERE u.id = 1;
-        
-
-        
-        SELECT f.*,
-			  u.id AS idUsuariio
-        FROM usuario AS u
-        JOIN ficha AS f
-        ON u.id = f.fkUsuario
-        WHERE u.id = 1;
-        
-        
-        
-        UPDATE ficha SET status = 1
-			WHERE id = 4;
-            
-		UPDATE ficha AS f SET status = 0
-		WHERE id <> 1 AND (SELECT id FROM usuario WHERE id = 1);
-	
-
-        SELECT 
-         u.nome AS nome,
-         t.titulo AS tituloTreino
-      FROM usuario AS u
-      JOIN ficha AS f
-	  ON f.fkUsuario = u.id
-      JOIN treino AS t
-      ON t.fkFicha = f.id
-        WHERE f.id = 1 AND f.status  = 1;
-        
-        -- ELECIONA A FICHA EM ESPECIFICO
-  SELECT * FROM ficha WHERE id = 1;
-  
-  
-  
-   UPDATE ficha SET status = 1 WHERE id =  1;
-
--- -------------------------------------------------------------------------------------TREINOS ------------------------------------------------------------------------------------------------
-  SELECT COUNT(f.id) AS temFicha
-        FROM usuario AS u
-		JOIN ficha AS f
-        ON f.fkUsuario = u.id
-      WHERE u.id =6;
-
-
--- Treino 1 
-
-  SELECT 
-	    t.*
-        FROM ficha AS f
-        JOIN treino AS t
-        ON t.fkFicha = f.id
-        JOIN usuario AS u
-        ON f.fkUsuario = u.id
-        WHERE u.id = 1 AND f.status = 1
-        GROUP BY t.id, t.titulo;
-
-        
-	SELECT
-    t.titulo AS treino,
-		e.*
-		FROM ficha AS f
-        JOIN treino AS t
-        ON t.fkFicha = f.id
-        JOIN usuario AS u
-        ON f.fkUsuario = u.id
-        JOIN exercicio AS e
-        ON e.fkTreino = t.id
-        WHERE f.status = 1 AND u.id = 1;
-        
-SELECT
-       t.titulo AS treino,
-		e.musculo AS musculo,
-		e.nome AS nomeExercicio,
-        e.equipamento AS equipamento
-	FROM ficha AS f
-	JOIN treino AS t
-	 ON t.fkFicha = f.id
-	JOIN usuario AS u
-	 ON f.fkUsuario = u.id
-	JOIN exercicio AS e
-	 ON e.fkTreino = t.id
-	    WHERE f.status = 1 AND u.id = 1 AND t.id = 3;
-        
-        
-		
-        
-        
-    SELECT 
-    t.id,
-    t.titulo,
-    COUNT(e.id) AS totalExercicios
-	FROM treino t
-    LEFT JOIN exercicio e 
-    ON t.id = e.fkTreino
-    WHERE t.fkFicha = 1
-GROUP BY t.id, t.titulo;
-
-
-       SELECT 
-       f.status AS statusFicha,
-	   f.id AS idFicha,
-       t.id AS idTreino,
-       t.titulo AS titulo
-        FROM ficha AS f
-        JOIN treino AS t ON t.fkFicha = f.id
-        JOIN exercicio AS e ON e.fkTreino = t.id
-        WHERE f.id = 1 AND f.status  = 1;
-
-   
-   
-   
-   
-       
-    -- Deleto todas as series relacionadas aos exercicios do treino 1 
-  DELETE FROM serie WHERE fkExercicio IN (SELECT id FROM exercicio WHERE fkTreino = 3);
-       -- Deleto todas os exercicios relacionadas ao treino  1 
-   DELETE FROM exercicio WHERE fkTreino IN (SELECT id FROM treino WHERE fkTreino = 3);
-   DELETE FROM treino WHERE id = 3;
-
-
-   
-   -- ---------------------------------------------------------------------------Exercicios -------------------------------------------------------------------------------------------------------
-   
-   SELECT * FROM  serie WHERE fkExercicio IN (SELECT id FROM exercicio WHERE id = 7);
-   SELECT * FROM exercicio WHERE id = 34;
-   SELECT * FROM serie WHERE fkExercicio = 34;
-   
-   
-  -- DELETE FROM serie WHERE fkExercicio = 45;
-   
-   
-   
-        
--- exercicios do 
-  SELECT 
-		f.titulo AS 'Nome Fiacha',
-        t.titulo,
-		e.*
-        FROM ficha AS f
-        JOIN treino AS t
-        ON t.fkFicha = f.id
-        JOIN usuario AS u
-        ON f.fkUsuario = u.id
-        JOIN exercicio AS e
-        ON e.fkTreino = t.id
-        WHERE t.id = 9;
-        
-	SELECT 
-		e.musculo AS musculo,
-		e.nome AS nomeExercicio,
-        e.equipamento AS equipamento,
-        e.musculo AS musculo
-        FROM treino AS t
-        JOIN exercicio AS e
-        ON e.fkTreino = t.id
-        WHERE t.id = 9;
-        
-        
-        
-           
-   DELETE FROM serie WHERE fkExercicio IN (SELECT id FROM exercicio WHERE id = 40);
-   DELETE FROM exercicio WHERE id = 40;
-        DELETE FROM exercicio WHERE id = 46;
-        
-        
-
-        
-        
-	
-
-
-
-  SELECT u.nome AS 'Nome do usuario',
-         f.* 
-        FROM usuario AS u
-        JOIN ficha AS f
-        ON f.fkUsuario = u.id
-        WHERE u.id = 1 AND MAX(f.id);
-        
--- ------------------------------------------------------------------------------------------------------------- SERIES ----------------------------------------------------------------------------------------
-
-
+-- Conferência resumida do catálogo de fichas modelo (deve retornar 30 linhas)
 SELECT 
-	week( serieRealizada , 1) AS Semanas,
-    COUNT(id) AS serieRealizada
-    FROM serie
-		WHERE serieRealizada BETWEEN '2025/01/01' AND '2025/02/01'
-   GROUP BY week(serieRealizada , 1)    
-   ORDER BY week(serieRealizada , 1);
+    f.id, 
+    f.titulo, 
+    t.titulo AS treino, 
+    e.nome AS exercicio
+FROM ficha f
+JOIN treino t ON t.fkFicha = f.id
+JOIN exercicio e ON e.fkTreino = t.id
+WHERE f.fkUsuario IS NULL;
 
-SELECT * FROM serie WHERE fkExercicio = 4;        
-        
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-SELECT f.titulo , COUNT(*) FROM ficha AS f WHERE fkUsuario = 1 GROUP BY f.titulo;
-SELECT * FROM treino WHERE id= 3;
-SELECT * FROM treino WHERE id= 2;
+-- Lista todas as fichas modelo disponíveis no catálogo (fkUsuario IS NULL)
+SELECT 
+    f.id AS idFicha,
+    f.titulo AS tituloFicha,
+    f.objetivo AS objetivoFicha,
+    f.descricao AS descricaoFicha,
+    t.id AS idTreino,
+    t.titulo AS tituloTreino,
+    t.observacao AS observacaoTreino,
+    e.id AS idExercicio,
+    e.nome AS nomeExercicio,
+    e.descricao AS descricaoExercicio,
+    e.musculo AS musculo,
+    e.equipamento AS equipamento
+FROM ficha f
+JOIN treino t ON t.fkFicha = f.id
+JOIN exercicio e ON e.fkTreino = t.id
+WHERE f.fkUsuario IS NULL
+ORDER BY f.id ASC, t.id ASC, e.id ASC;
 
--- FOCO NO USER 1
-SELECT * FROM usuario;
-SELECT * FROM ficha;
-SELECT * FROM treino;
-SELECT * FROM exercicio;
-SELECT * FROM serie;
+-- Busca uma ficha modelo específica pelo ID para clonar para o usuário
+SELECT 
+    f.id AS idFicha,
+    f.titulo AS tituloFicha,
+    f.objetivo AS objetivoFicha,
+    f.descricao AS descricaoFicha,
+    t.id AS idTreino,
+    t.titulo AS tituloTreino,
+    t.observacao AS observacaoTreino,
+    e.nome AS nomeExercicio,
+    e.descricao AS descricaoExercicio,
+    e.musculo AS musculo,
+    e.equipamento AS equipamento
+FROM ficha f
+JOIN treino t ON t.fkFicha = f.id
+JOIN exercicio e ON e.fkTreino = t.id
+WHERE f.id = 1
+ORDER BY t.id ASC, e.id ASC;
+
+-- Busca a ficha ativa (status = 1) com todos os treinos e exercícios do usuário
+SELECT 
+    f.id AS idFicha,
+    f.titulo AS tituloFicha,
+    f.objetivo AS objetivoFicha,
+    f.descricao AS descricaoFicha,
+    t.id AS idTreino,
+    t.titulo AS tituloTreino,
+    t.observacao AS observacaoTreino,
+    e.id AS idExercicio,
+    e.nome AS nomeExercicio,
+    e.descricao AS descricaoExercicio,
+    e.musculo AS musculo,
+    e.equipamento AS equipamento
+FROM ficha f
+JOIN treino t ON t.fkFicha = f.id
+JOIN exercicio e ON e.fkTreino = t.id
+WHERE f.fkUsuario = 1 AND f.status = 1
+ORDER BY t.id ASC, e.id ASC;
+
+-- ============================================================================
+-- 2. DASHBOARD E MÉTRICAS DE DESEMPENHO (dashboardModel.js)
+-- ============================================================================
+
+-- KPIs principais: total de fichas, ficha ativa, séries, volume total e maior carga
+SELECT 
+    (SELECT COUNT(*) FROM ficha WHERE fkUsuario = 1) AS totalFichas,
+    (SELECT titulo FROM ficha WHERE fkUsuario = 1 AND status = 1 LIMIT 1) AS fichaAtiva,
+    COUNT(s.id) AS totalSeries,
+    IFNULL(ROUND(SUM(s.cargaRealizada * s.repeticoes), 1), 0) AS volumeTotal,
+    IFNULL(ROUND(MAX(s.cargaRealizada), 1), 0) AS maiorCarga
+FROM ficha f
+JOIN treino t ON t.fkFicha = f.id
+JOIN exercicio e ON e.fkTreino = t.id
+JOIN serie s ON s.fkExercicio = e.id
+WHERE f.fkUsuario = 1;
+
+-- Gráfico de linha: progressão das últimas 15 séries registradas em ordem cronológica
+SELECT * FROM (
+    SELECT 
+        s.id AS idSerie,
+        e.nome AS exercicio,
+        DATE_FORMAT(s.serieRealizada, '%d/%m %H:%i') AS momento,
+        s.cargaRealizada AS carga,
+        s.repeticoes AS repeticoes
+    FROM ficha f
+    JOIN treino t ON t.fkFicha = f.id
+    JOIN exercicio e ON e.fkTreino = t.id
+    JOIN serie s ON s.fkExercicio = e.id
+    WHERE f.fkUsuario = 1
+    ORDER BY s.id DESC
+    LIMIT 15
+) AS ultimas
+ORDER BY idSerie ASC;
+
+-- Gráfico de rosca: distribuição de séries e média de carga por grupo muscular
+SELECT 
+    e.musculo AS musculo,
+    COUNT(s.id) AS totalSeries,
+    IFNULL(ROUND(AVG(s.cargaRealizada), 1), 0) AS mediaCarga
+FROM ficha f
+JOIN treino t ON t.fkFicha = f.id
+JOIN exercicio e ON e.fkTreino = t.id
+JOIN serie s ON s.fkExercicio = e.id
+WHERE f.fkUsuario = 1
+GROUP BY e.musculo
+ORDER BY totalSeries DESC;
+
+-- Gráfico de barras (opcional): total de séries realizadas por semana
+SELECT 
+    CONCAT('Semana ', WEEK(s.serieRealizada, 1)) AS semana,
+    YEARWEEK(s.serieRealizada, 1) AS anoSemana,
+    COUNT(s.id) AS totalSeries
+FROM ficha f
+JOIN treino t ON t.fkFicha = f.id
+JOIN exercicio e ON e.fkTreino = t.id
+JOIN serie s ON s.fkExercicio = e.id
+WHERE f.fkUsuario = 1
+GROUP BY anoSemana, semana
+ORDER BY anoSemana ASC
+LIMIT 8;
