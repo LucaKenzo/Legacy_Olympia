@@ -19,6 +19,8 @@ var indexRouter     = require("./src/routes/index");
 var usuarioRouter   = require("./src/routes/usuarios");
 var dashboardRouter = require("./src/routes/dashboard");
 var fichaRouter     = require("./src/routes/fichas");
+var fichasRouter = require("./src/routes/fichas");
+var dashboardRouter = require("./src/routes/dashboard");
 
 // ── Middlewares ────────────────────────────────
 app.use(express.json());
@@ -31,6 +33,8 @@ app.use("/",          indexRouter);
 app.use("/usuarios",  usuarioRouter);
 app.use("/dashboard", dashboardRouter);
 app.use("/fichas",    fichaRouter);
+app.use("/fichas", fichasRouter);
+app.use("/dashboard", dashboardRouter);
 
 app.listen(PORTA_APP, function () {
     console.log(`
