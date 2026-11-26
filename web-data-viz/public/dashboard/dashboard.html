@@ -5,24 +5,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Legacy Olympia | Dashboard</title>
-  <link rel="stylesheet" href="./css/estilo.css">
-  <link rel="icon" href="./assets/icon/favicon2.ico">
-  <script src="./js/sessao.js"></script>
+  <link rel="stylesheet" href="/css/estilo.css">
+  <link rel="icon" href="/assets/icon/favicon2.ico">
+  <script src="/js/sessao.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body onload="validarSessao(); carregarDashboard();">
+<body onload="inicializarDashboard()">
 
-  <!-- TOPO ORIGINAL DO ESTILO.CSS -->
+  <!-- TOPO -->
   <div class="topo">
     <div class="container linha">
-      <a href="index.html">
-        <img src="./assets/logo-legacy-olympia.png" alt="Legacy Olympia" class="logo-topo">
+      <a href="/index.html">
+        <img src="/assets/logo-legacy-olympia.png" alt="Legacy Olympia" class="logo-topo">
       </a>
       <div class="menu">
         <span class="cinza">Olá, <strong id="b_usuario" class="vermelho">atleta</strong></span>
-        <a href="dashboard.html" class="ativo">Dashboard</a>
-        <a href="fichas.html">Fichas de Treino</a>
+        <a href="/dashboard/dashboard.html" class="ativo">Dashboard</a>
+        <a href="/fichas.html">Fichas de Treino</a>
         <a href="#" onclick="limparSessao()">Sair</a>
       </div>
     </div>
@@ -35,15 +35,65 @@
         <p class="vermelho pequeno">ANÁLISE DE PERFORMANCE</p>
         <h1>Seu Legado em Números</h1>
       </div>
-      <a href="fichas.html" class="botao">+ REGISTRAR TREINO</a>
+      <a href="/fichas.html" class="botao borda">Trocar Ficha</a>
     </div>
 
     <div id="div_aviso_vazio" class="card destaque" style="display: none; margin-bottom: 20px;">
       <p class="vermelho"><strong>Nenhuma série registrada ainda.</strong></p>
-      <p class="cinza" style="margin: 0;">Vá em <a href="fichas.html" class="vermelho">Fichas de Treino</a>, ative uma rotina e registre suas séries para acompanhar os gráficos.</p>
+      <p class="cinza" style="margin: 0;">Registre suas séries no formulário abaixo ou vá em <a href="/fichas.html" class="vermelho">Fichas de Treino</a> para ativar uma rotina.</p>
     </div>
 
-    <!-- KPIS EM 4 COLUNAS (.col4) -->
+    <!-- REGISTRO DE SÉRIES DO TREINO ATIVO -->
+    <div class="card destaque" style="margin-bottom: 24px;">
+      <p class="vermelho pequeno">DIÁRIO DE TREINO</p>
+      <h3>Registrar Série Realizada</h3>
+      <p class="cinza pequeno" id="desc_ficha_registro">Carregando sua ficha ativa...</p>
+
+      <div class="col4" style="margin-top: 14px;">
+        <div>
+          <label class="cinza pequeno">Divisão do Treino</label>
+          <select id="select_treino" class="ficha-select" onchange="atualizarSelectExercicios()" style="width: 100%; padding: 14px;">
+            <option value="">Selecione o treino...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="cinza pequeno">Exercício</label>
+          <select id="select_exercicio" class="ficha-select" style="width: 100%; padding: 14px;">
+            <option value="">Selecione o exercício...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="cinza pequeno">Carga (kg)</label>
+          <input type="number" id="input_carga" step="0.5" min="0" placeholder="Ex: 40" style="margin-bottom: 0;">
+        </div>
+
+        <div>
+          <label class="cinza pequeno">Repetições</label>
+          <input type="number" id="input_repeticoes" min="1" placeholder="Ex: 10" style="margin-bottom: 0;">
+        </div>
+      </div>
+
+      <div class="linha" style="margin-top: 14px; align-items: flex-end;">
+        <div style="min-width: 220px;">
+          <label class="cinza pequeno">Tempo de Descanso</label>
+          <select id="select_descanso" class="ficha-select" style="width: 100%; padding: 12px;">
+            <option value="00:00:45">45 segundos</option>
+            <option value="00:01:00" selected>1 minuto (01:00)</option>
+            <option value="00:01:30">1 min 30s (01:30)</option>
+            <option value="00:02:00">2 minutos (02:00)</option>
+            <option value="00:03:00">3 minutos (03:00)</option>
+          </select>
+        </div>
+
+        <button class="botao" onclick="registrarSerieTreino()">+ SALVAR SÉRIE</button>
+      </div>
+
+      <div id="div_msg_serie" class="mensagem" style="margin-top: 10px;"></div>
+    </div>
+
+    <!-- KPIS EM 4 COLUNAS -->
     <div class="col4">
       <div class="card destaque">
         <p class="cinza pequeno">FICHA ATIVA</p>
@@ -101,12 +151,138 @@
   var chartCarga = null;
   var chartSemana = null;
   var chartMusculos = null;
+  var treinosFichaAtiva = [];
+
+  function inicializarDashboard() {
+    validarSessao();
+    carregarFichaAtivaParaRegistro();
+    carregarDashboard();
+  }
+
+  function carregarFichaAtivaParaRegistro() {
+    var idUsuario = sessionStorage.ID_USUARIO;
+    if (!idUsuario) return;
+
+    fetch(`/fichas/ativa/${idUsuario}`, { cache: "no-store" })
+      .then(function (resposta) {
+        return resposta.json();
+      })
+      .then(function (linhas) {
+        var selectTreino = document.getElementById("select_treino");
+        var desc = document.getElementById("desc_ficha_registro");
+        treinosFichaAtiva = [];
+
+        if (linhas.length === 0) {
+          desc.innerHTML = 'Você ainda não ativou nenhuma ficha. <a href="/fichas.html" class="vermelho">Escolha sua ficha aqui</a>.';
+          selectTreino.innerHTML = '<option value="">Nenhuma ficha ativa</option>';
+          return;
+        }
+
+        desc.innerText = `Ficha ativa: ${linhas[0].tituloFicha} — ${linhas[0].descricaoFicha}`;
+
+        for (var i = 0; i < linhas.length; i++) {
+          var item = linhas[i];
+          var treinoObj = null;
+
+          for (var t = 0; t < treinosFichaAtiva.length; t++) {
+            if (treinosFichaAtiva[t].idTreino === item.idTreino) {
+              treinoObj = treinosFichaAtiva[t];
+              break;
+            }
+          }
+
+          if (!treinoObj) {
+            treinoObj = {
+              idTreino: item.idTreino,
+              titulo: item.tituloTreino,
+              exercicios: []
+            };
+            treinosFichaAtiva.push(treinoObj);
+          }
+
+          treinoObj.exercicios.push({
+            idExercicio: item.idExercicio,
+            nome: item.nomeExercicio,
+            musculo: item.musculo,
+            descricao: item.descricaoExercicio
+          });
+        }
+
+        selectTreino.innerHTML = "";
+        for (var j = 0; j < treinosFichaAtiva.length; j++) {
+          selectTreino.innerHTML += `<option value="${j}">${treinosFichaAtiva[j].titulo}</option>`;
+        }
+
+        atualizarSelectExercicios();
+      })
+      .catch(function (erro) {
+        console.error("Erro ao carregar ficha ativa:", erro);
+      });
+  }
+
+  function atualizarSelectExercicios() {
+    var indiceTreino = document.getElementById("select_treino").value;
+    var selectExercicio = document.getElementById("select_exercicio");
+    selectExercicio.innerHTML = "";
+
+    if (indiceTreino === "" || !treinosFichaAtiva[indiceTreino]) {
+      selectExercicio.innerHTML = '<option value="">Selecione um treino primeiro</option>';
+      return;
+    }
+
+    var exercicios = treinosFichaAtiva[indiceTreino].exercicios;
+    for (var i = 0; i < exercicios.length; i++) {
+      var ex = exercicios[i];
+      selectExercicio.innerHTML += `<option value="${ex.idExercicio}">${ex.nome} (${ex.musculo})</option>`;
+    }
+  }
+
+  function registrarSerieTreino() {
+    var fkExercicio = document.getElementById("select_exercicio").value;
+    var carga = document.getElementById("input_carga").value;
+    var repeticoes = document.getElementById("input_repeticoes").value;
+    var tempoDescanso = document.getElementById("select_descanso").value;
+    var msg = document.getElementById("div_msg_serie");
+
+    if (!fkExercicio || carga === "" || repeticoes === "" || Number(repeticoes) <= 0 || Number(carga) < 0) {
+      msg.className = "mensagem erro";
+      msg.innerText = "Selecione o exercício e preencha carga e repetições válidas.";
+      return;
+    }
+
+    fetch("/fichas/registrar-serie", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fkExercicioServer: Number(fkExercicio),
+        tempoDescansoServer: tempoDescanso,
+        repeticoesServer: Number(repeticoes),
+        cargaRealizadaServer: Number(carga)
+      })
+    })
+      .then(function (resposta) {
+        if (resposta.ok) {
+          msg.className = "mensagem ok";
+          msg.innerText = "Série registrada com sucesso! Atualizando gráficos...";
+          document.getElementById("div_aviso_vazio").style.display = "none";
+          carregarDashboard();
+        } else {
+          msg.className = "mensagem erro";
+          msg.innerText = "Erro ao salvar a série no banco de dados.";
+        }
+      })
+      .catch(function (erro) {
+        console.error("Erro ao registrar série:", erro);
+        msg.className = "mensagem erro";
+        msg.innerText = "Falha de comunicação com o servidor.";
+      });
+  }
 
   function carregarDashboard() {
     var idUsuario = sessionStorage.ID_USUARIO;
 
     if (!idUsuario) {
-      window.location = "login.html";
+      window.location = "/login.html";
       return;
     }
 
@@ -121,6 +297,8 @@
 
             if (Number(dados.kpis.totalSeries) === 0) {
               document.getElementById("div_aviso_vazio").style.display = "block";
+            } else {
+              document.getElementById("div_aviso_vazio").style.display = "none";
             }
           });
         } else {
