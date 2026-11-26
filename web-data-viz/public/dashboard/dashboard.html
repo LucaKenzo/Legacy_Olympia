@@ -42,7 +42,6 @@
       <p class="cinza" style="margin: 0;">Registre suas séries no formulário abaixo para acompanhar sua progressão no gráfico.</p>
     </div>
 
-    <!-- REGISTRO DE SÉRIES -->
     <div class="card destaque" style="margin-bottom: 24px;">
       <p class="vermelho pequeno">DIÁRIO DE TREINO</p>
       <h3>Registrar Série Realizada</h3>
@@ -92,7 +91,6 @@
       <div id="div_msg_serie" class="mensagem" style="margin-top: 10px;"></div>
     </div>
 
-    <!-- KPIS EM 4 COLUNAS -->
     <div class="col4">
       <div class="card destaque">
         <p class="cinza pequeno">FICHA ATIVA</p>
@@ -112,7 +110,6 @@
       </div>
     </div>
 
-    <!-- GRÁFICOS EM .col2 -->
     <div class="col2" style="margin-top: 24px;">
       <div class="card">
         <p class="vermelho pequeno">PROGRESSÃO DE CARGA</p>
@@ -127,6 +124,23 @@
       </div>
     </div>
   </div>
+
+    <div class="card destaque" style="margin-top: 16px;">
+      <p class="vermelho pequeno">ANÁLISE MATEMÁTICA DE DESEMPENHO</p>
+      <h3>Indicadores Calculados das Últimas Séries</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px;">
+        <div class="card">
+          <p class="cinza pequeno">MÉDIA DE CARGA (ARITMÉTICA)</p>
+          <h2 id="calc_media_carga">0 kg</h2>
+          <p class="cinza pequeno" id="calc_qtd_series">Média entre as séries plotadas</p>
+        </div>
+        <div class="card">
+          <p class="cinza pequeno">PROGRESSÃO PERCENTUAL</p>
+          <h2 id="calc_evolucao_pct" class="vermelho">0%</h2>
+          <p class="cinza pequeno" id="calc_detalhe_evolucao">Da primeira à última série</p>
+        </div>
+      </div>
+    </div>
 
   <div class="rodape">
     <div class="container linha">
@@ -283,6 +297,7 @@
         if (resposta.ok) {
           resposta.json().then(function (dados) {
             atualizarKpis(dados.kpis);
+            calcularMetricasMatematicas(dados.evolucaoCarga);
             plotarEvolucaoCarga(dados.evolucaoCarga);
             plotarMusculos(dados.distribuicaoMuscular);
 
@@ -299,6 +314,49 @@
       .catch(function (erro) {
         console.error("Erro na requisição da dashboard:", erro);
       });
+  }
+
+  function calcularMetricasMatematicas(lista) {
+    var elMedia = document.getElementById("calc_media_carga");
+    var elQtd = document.getElementById("calc_qtd_series");
+    var elPct = document.getElementById("calc_evolucao_pct");
+    var elDetalhe = document.getElementById("calc_detalhe_evolucao");
+
+    if (!lista || lista.length === 0) {
+      elMedia.innerText = "0 kg";
+      elQtd.innerText = "Nenhuma série registrada ainda";
+      elPct.innerText = "0%";
+      elDetalhe.innerText = "Registre séries para calcular a evolução";
+      return;
+    }
+
+    var somaCargas = 0;
+
+    for (var i = 0; i < lista.length; i++) {
+      var valorCarga = lista[i].carga !== undefined ? lista[i].carga : lista[i].cargaMaxima;
+      somaCargas += Number(valorCarga);
+    }
+
+    var mediaCarga = somaCargas / lista.length;
+
+    var primeiraCarga = Number(lista[0].carga !== undefined ? lista[0].carga : lista[0].cargaMaxima);
+    var ultimaCarga = Number(
+      lista[lista.length - 1].carga !== undefined
+        ? lista[lista.length - 1].carga
+        : lista[lista.length - 1].cargaMaxima
+    );
+
+    var variacaoPercentual = 0;
+    if (primeiraCarga > 0) {
+      variacaoPercentual = ((ultimaCarga - primeiraCarga) / primeiraCarga) * 100;
+    }
+
+    var sinal = variacaoPercentual > 0 ? "+" : "";
+
+    elMedia.innerText = `${mediaCarga.toFixed(1)} kg`;
+    elQtd.innerText = `Média calculada em ${lista.length} série(s)`;
+    elPct.innerText = `${sinal}${variacaoPercentual.toFixed(1)}%`;
+    elDetalhe.innerText = `De ${primeiraCarga} kg (1ª) para ${ultimaCarga} kg (última)`;
   }
 
   function atualizarKpis(kpis) {
@@ -385,4 +443,5 @@
       }
     });
   }
-</script>
+
+  </script>

@@ -110,6 +110,22 @@ function registrarSerie(fkExercicio, tempoDescanso, repeticoes, cargaRealizada) 
     return database.executar(instrucaoSql);
 }
 
+function buscarFichaUsuarioPorTitulo(idUsuario, titulo) {
+    var instrucaoSql = `
+        SELECT id FROM ficha 
+        WHERE fkUsuario = ${idUsuario} AND titulo = '${titulo}' 
+        LIMIT 1;
+    `;
+    return database.executar(instrucaoSql);
+}
+
+function ativarFichaExistente(idFicha) {
+    var instrucaoSql = `
+        UPDATE ficha SET status = 1 WHERE id = ${idFicha};
+    `;
+    return database.executar(instrucaoSql);
+}
+
 module.exports = {
     listarFichasModelo,
     buscarFichaModeloPorId,
@@ -118,5 +134,7 @@ module.exports = {
     cadastrarTreino,
     cadastrarExerciciosEmLote,
     buscarFichaAtiva,
-    registrarSerie
+    registrarSerie,
+    buscarFichaUsuarioPorTitulo,
+    ativarFichaExistente
 };

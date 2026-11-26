@@ -40,7 +40,7 @@ function escolherFicha(req, res) {
     var idUsuario = req.body.idUsuarioServer;
     var idFichaModelo = req.body.idFichaModeloServer;
 
-    if (idUsuario == undefined || idFichaModelo == undefined) {
+    if (!idUsuario || !idFichaModelo) {
         res.status(400).send("Dados incompletos para ativar a ficha!");
         return;
     }
@@ -55,46 +55,63 @@ function escolherFicha(req, res) {
             var titulo = linhas[0].tituloFicha;
             var objetivo = linhas[0].objetivoFicha;
             var descricao = linhas[0].descricaoFicha;
-            var treinos = [];
 
-            for (var i = 0; i < linhas.length; i++) {
-                var item = linhas[i];
-                var treinoEncontrado = null;
-
-                for (var t = 0; t < treinos.length; t++) {
-                    if (treinos[t].idOriginal === item.idTreino) {
-                        treinoEncontrado = treinos[t];
-                        break;
+            // Verifica se o usuário já possui essa ficha cadastrada no banco
+            return fichaModel.buscarFichaUsuarioPorTitulo(idUsuario, titulo)
+                .then(function (existentes) {
+                    if (existentes.length > 0) {
+                        var idFichaExistente = existentes[0].id;
+                        return fichaModel.desativarFichasUsuario(idUsuario)
+                            .then(function () {
+                                return fichaModel.ativarFichaExistente(idFichaExistente);
+                            })
+                            .then(function () {
+                                res.status(200).json({ mensagem: "Ficha reativada com sucesso!" });
+                            });
                     }
-                }
 
-                if (!treinoEncontrado) {
-                    treinoEncontrado = {
-                        idOriginal: item.idTreino,
-                        titulo: item.tituloTreino,
-                        observacao: item.observacaoTreino,
-                        exercicios: []
-                    };
-                    treinos.push(treinoEncontrado);
-                }
+                    // Se nunca escolheu essa ficha antes, clona o modelo para o usuário
+                    var treinos = [];
 
-                treinoEncontrado.exercicios.push({
-                    nome: item.nomeExercicio,
-                    descricao: item.descricaoExercicio,
-                    musculo: item.musculo,
-                    equipamento: item.equipamento
-                });
-            }
+                    for (var i = 0; i < linhas.length; i++) {
+                        var item = linhas[i];
+                        var treinoEncontrado = null;
 
-            return fichaModel.desativarFichasUsuario(idUsuario)
-                .then(function () {
-                    return fichaModel.cadastrarFicha(idUsuario, objetivo, titulo, descricao);
-                })
-                .then(function (resultadoFicha) {
-                    return salvarTreinosEmSequencia(treinos, 0, resultadoFicha.insertId);
-                })
-                .then(function () {
-                    res.status(201).json({ mensagem: "Ficha ativada com sucesso!" });
+                        for (var t = 0; t < treinos.length; t++) {
+                            if (treinos[t].idOriginal === item.idTreino) {
+                                treinoEncontrado = treinos[t];
+                                break;
+                            }
+                        }
+
+                        if (!treinoEncontrado) {
+                            treinoEncontrado = {
+                                idOriginal: item.idTreino,
+                                titulo: item.tituloTreino,
+                                observacao: item.observacaoTreino,
+                                exercicios: []
+                            };
+                            treinos.push(treinoEncontrado);
+                        }
+
+                        treinoEncontrado.exercicios.push({
+                            nome: item.nomeExercicio,
+                            descricao: item.descricaoExercicio,
+                            musculo: item.musculo,
+                            equipamento: item.equipamento
+                        });
+                    }
+
+                    return fichaModel.desativarFichasUsuario(idUsuario)
+                        .then(function () {
+                            return fichaModel.cadastrarFicha(idUsuario, objetivo, titulo, descricao);
+                        })
+                        .then(function (resultadoFicha) {
+                            return salvarTreinosEmSequencia(treinos, 0, resultadoFicha.insertId);
+                        })
+                        .then(function () {
+                            res.status(201).json({ mensagem: "Ficha ativada com sucesso!" });
+                        });
                 });
         })
         .catch(function (erro) {
