@@ -30,7 +30,6 @@ function obterDadosDashboard(req, res) {
         })
         .catch(function (erro) {
             console.log(erro);
-            console.log("\nHouve um erro ao buscar dados da dashboard! Erro: ", erro.sqlMessage);
             res.status(500).json(erro.sqlMessage);
         });
 }

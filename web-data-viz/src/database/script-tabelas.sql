@@ -63,20 +63,6 @@ CREATE TABLE serie (
     CONSTRAINT fkSerieExercicio FOREIGN KEY (fkExercicio) REFERENCES exercicio(id)
 );
 
--- --------------------------------------------------------------------------------
-
-
--- INSERT INTO usuario (nome, email, senha, peso, dataTreino) VALUES
--- ('Guilherme', 'gui@gmail.com', '123', 78.5, '2025-01-10'),
--- ('Ana', 'ana@gmail.com', '123', 62.3, '2025-01-11'),
--- ('Carlos', 'carlos@gmail.com', '123', 85.0, '2025-01-12');
-
-USE legacyOlympia;
-
--- Permite fichas modelo sem usuário vinculado (fkUsuario = NULL)
-ALTER TABLE ficha DROP PRIMARY KEY, ADD PRIMARY KEY (id);
-ALTER TABLE ficha MODIFY COLUMN fkUsuario INT NULL;
-
 -- Insere as 3 fichas modelo
 INSERT INTO ficha (id, objetivo, fkUsuario, titulo, descricao, status) VALUES
 (1, 'Corpo todo', NULL, 'ABC', 'Hipertrofia clássica • 3 dias / semana', 0),
@@ -132,7 +118,7 @@ INSERT INTO exercicio (nome, descricao, musculo, fkTreino, equipamento) VALUES
 ('Rosca direta', '3 séries · 12 reps', 'Biceps', 7, 'Barra'),
 ('Tríceps corda', '3 séries · 12 reps', 'Triceps', 7, 'Maquina');
 
--- Conferência: precisa retornar 30 linhas no terminal do MySQL
+-- Conferência (precisa retornar exatamente 30 linhas)
 SELECT f.id, f.titulo, t.titulo AS treino, e.nome AS exercicio
 FROM ficha f
 JOIN treino t ON t.fkFicha = f.id

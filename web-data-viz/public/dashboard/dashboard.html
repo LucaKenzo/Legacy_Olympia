@@ -13,7 +13,6 @@
 
 <body onload="inicializarDashboard()">
 
-  <!-- TOPO -->
   <div class="topo">
     <div class="container linha">
       <a href="/index.html">
@@ -40,10 +39,10 @@
 
     <div id="div_aviso_vazio" class="card destaque" style="display: none; margin-bottom: 20px;">
       <p class="vermelho"><strong>Nenhuma série registrada ainda.</strong></p>
-      <p class="cinza" style="margin: 0;">Registre suas séries no formulário abaixo ou vá em <a href="/fichas.html" class="vermelho">Fichas de Treino</a> para ativar uma rotina.</p>
+      <p class="cinza" style="margin: 0;">Registre suas séries no formulário abaixo para acompanhar sua progressão no gráfico.</p>
     </div>
 
-    <!-- REGISTRO DE SÉRIES DO TREINO ATIVO -->
+    <!-- REGISTRO DE SÉRIES -->
     <div class="card destaque" style="margin-bottom: 24px;">
       <p class="vermelho pequeno">DIÁRIO DE TREINO</p>
       <h3>Registrar Série Realizada</h3>
@@ -117,7 +116,7 @@
     <div class="col2" style="margin-top: 24px;">
       <div class="card">
         <p class="vermelho pequeno">PROGRESSÃO DE CARGA</p>
-        <h3>Evolução de Carga (kg) por Treino</h3>
+        <h3>Evolução de Carga (kg) por Série</h3>
         <canvas id="graficoEvolucaoCarga"></canvas>
       </div>
 
@@ -263,7 +262,7 @@
       .then(function (resposta) {
         if (resposta.ok) {
           msg.className = "mensagem ok";
-          msg.innerText = "Série registrada com sucesso! Atualizando gráficos...";
+          msg.innerText = "Série registrada com sucesso!";
           document.getElementById("div_aviso_vazio").style.display = "none";
           carregarDashboard();
         } else {
@@ -319,13 +318,11 @@
 
   function plotarEvolucaoCarga(lista) {
     var labels = [];
-    var mediaCarga = [];
-    var cargaMaxima = [];
+    var cargas = [];
 
     for (var i = 0; i < lista.length; i++) {
-      labels.push(lista[i].dataTreino);
-      mediaCarga.push(Number(lista[i].mediaCarga));
-      cargaMaxima.push(Number(lista[i].cargaMaxima));
+      labels.push(`#${i + 1} (${lista[i].momento})`);
+      cargas.push(Number(lista[i].carga));
     }
 
     if (chartCarga) chartCarga.destroy();
@@ -336,25 +333,30 @@
         labels: labels,
         datasets: [
           {
-            label: "Carga Máxima (kg)",
-            data: cargaMaxima,
+            label: "Carga Realizada (kg)",
+            data: cargas,
             borderColor: "#e0143a",
             backgroundColor: "rgba(200, 16, 46, 0.2)",
             tension: 0.3,
-            fill: true
-          },
-          {
-            label: "Carga Média (kg)",
-            data: mediaCarga,
-            borderColor: "#8b8b93",
-            backgroundColor: "transparent",
-            tension: 0.3
+            fill: true,
+            pointRadius: 5,
+            pointHoverRadius: 7
           }
         ]
       },
       options: {
         responsive: true,
-        plugins: { legend: { labels: { color: "#f4f1ea" } } },
+        plugins: {
+          legend: { labels: { color: "#f4f1ea" } },
+          tooltip: {
+            callbacks: {
+              afterLabel: function (ctx) {
+                var item = lista[ctx.dataIndex];
+                return `${item.exercicio} • ${item.repeticoes} reps`;
+              }
+            }
+          }
+        },
         scales: {
           x: { ticks: { color: "#8b8b93" }, grid: { color: "#26262b" } },
           y: { ticks: { color: "#8b8b93" }, grid: { color: "#26262b" } }
